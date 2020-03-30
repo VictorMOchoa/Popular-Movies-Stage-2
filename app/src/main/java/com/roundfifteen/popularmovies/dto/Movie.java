@@ -14,6 +14,8 @@ public class Movie implements Serializable {
     private String plot;
     private String rating;
     private String releaseData;
+    private String id;
+    private int trailerPath;
 
     public Movie() {
     }
@@ -61,4 +63,32 @@ public class Movie implements Serializable {
         this.releaseData = releaseData;
     }
 
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public int getTrailerPath() {
+        return trailerPath;
+    }
+
+    public void setTrailerPath(int trailerPath) {
+        this.trailerPath = trailerPath;
+    }
+
+    @Override
+    public String toString() {
+        return "Movie{" +
+                "title='" + title + '\'' +
+                ", posterURL='" + posterURL + '\'' +
+                ", plot='" + plot + '\'' +
+                ", rating='" + rating + '\'' +
+                ", releaseData='" + releaseData + '\'' +
+                ", id='" + id + '\'' +
+                ", trailerPath=" + trailerPath +
+                '}';
+    }
 }

@@ -6,4 +6,7 @@
     <string name="rating_label">Rating:</string>
     <string name="release_label">Release Date:</string>
     <string name="description_label">Description:</string>
+    <string name="trailer_label">Trailer</string>
+    <string name="trailer_button_label">Watch</string>
+    <string name="reviews_label">Reviews:</string>
 </resources>

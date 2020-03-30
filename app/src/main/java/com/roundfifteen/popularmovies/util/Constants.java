@@ -1,6 +1,8 @@
 package com.roundfifteen.popularmovies.util;
 
 public final class Constants {
+    public static final String ID = "id";
+    public static final String KEY = "key";
     public static final String MOVIE = "movie";
     public static final String MOVIES = "movies";
     public static final String OVERVIEW = "overview";

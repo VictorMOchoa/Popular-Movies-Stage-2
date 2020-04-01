@@ -1,6 +1,8 @@
 package com.roundfifteen.popularmovies;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import android.content.Intent;
@@ -44,7 +46,21 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
     }
 
     private void loadMovies() {
-        new MovieDBQueryTask().execute(apiURL);
+        if (apiURL == null) {
+           MainViewModel mainViewModel = ViewModelProviders.of(this).get(MainViewModel.class);
+           mainViewModel.getAllMovies().observe(this, new Observer<List<Movie>>() {
+               @Override
+               public void onChanged(List<Movie> movies) {
+                   for (int i = 0; i < movies.size(); i++) {
+                       System.out.println(movies.get(i).getTitle());
+                   }
+                   adapter = new MovieAdapter(MainActivity.this, MainActivity.this, movies);
+                   moviesRecyclerView.setAdapter(adapter);
+               }
+           });
+        } else {
+            new MovieDBQueryTask().execute(apiURL);
+        }
     }
 
     @Override
@@ -100,6 +116,9 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
             case R.id.item_rating:
                 apiURL = "https://api.themoviedb.org/3/movie/top_rated?page=1&language=en-US&api_key=" + apiKey;
                 break;
+            case R.id.item_favorites:
+                apiURL = null;
+                break;
         }
         loadMovies();
         return true;
@@ -118,7 +137,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
             movie.setPosterURL(baseURL + ob.getString(POSTER_PATH));
             movie.setRating(ob.getString(VOTE_AVERAGE));
             movie.setReleaseData(ob.getString(RELEASE_DATE));
-            movie.setId(ob.getString(ID));
+            movie.setId(ob.getInt(ID));
             movies.add(movie);
         }
         return movies;

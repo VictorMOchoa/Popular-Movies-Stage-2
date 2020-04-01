@@ -14,14 +14,14 @@ import java.io.Serializable;
 
 @Entity(tableName = "favoriteMovies")
 public class Movie implements Serializable {
+    @PrimaryKey
+    @NonNull
+    private int id;
     private String title;
     private String posterURL;
     private String plot;
     private String rating;
     private String releaseData;
-    @PrimaryKey
-    @NonNull
-    private String id;
     private int trailerPath;
 
     public Movie() {
@@ -70,11 +70,11 @@ public class Movie implements Serializable {
         this.releaseData = releaseData;
     }
 
-    public String getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(int id) {
         this.id = id;
     }
 

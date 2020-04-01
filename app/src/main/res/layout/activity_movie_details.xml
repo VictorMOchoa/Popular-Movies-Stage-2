@@ -32,9 +32,10 @@
                 android:layout_width="109dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="right"
-                android:text="ToggleButton"
-                android:textOff="Unfavorite"
-                android:textOn="Favorite" />
+                android:background="@color/colorAccent"
+                android:textColor="@android:color/white"
+                android:textOff="Favorite"
+                android:textOn="Unfavorite" />
 
             <TextView
                 android:id="@+id/tv_rating_label"

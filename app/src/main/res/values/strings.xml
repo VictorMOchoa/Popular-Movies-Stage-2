@@ -3,6 +3,7 @@
     <string name="title_activity_movie_details">MovieDetails</string>
     <string name="sort_by_popular">Sort by Popularity</string>
     <string name="sort_by_rating">Sort by Top Rated</string>
+    <string name="show_favorites">Show Favorites</string>
     <string name="rating_label">Rating:</string>
     <string name="release_label">Release Date:</string>
     <string name="description_label">Description:</string>

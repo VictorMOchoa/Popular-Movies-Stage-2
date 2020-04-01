@@ -1,10 +1,12 @@
 package com.roundfifteen.popularmovies;
 
+import android.content.Context;
 import android.net.Uri;
 import android.os.AsyncTask;
 
 import android.os.Bundle;
 
+import com.roundfifteen.popularmovies.database.MovieDatabase;
 import com.roundfifteen.popularmovies.dto.Movie;
 import com.roundfifteen.popularmovies.util.ResponseUtil;
 import com.squareup.picasso.Picasso;
@@ -13,12 +15,17 @@ import android.content.Intent;
 
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.Observer;
 
 import android.view.View;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import org.json.JSONException;
 
@@ -35,7 +42,11 @@ public class MovieDetails extends AppCompatActivity {
  public String apiKey = BuildConfig.API_KEY;
  public LinearLayout trailerLayout;
  public Button trailerBtn;
+ public ToggleButton favoriteBtn;
  public TextView reviewTv;
+ public Movie receivedMovie;
+ public MovieDatabase movieDatabase;
+ public boolean favorited = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,18 +54,21 @@ public class MovieDetails extends AppCompatActivity {
         setContentView(R.layout.activity_movie_details);
 
         Intent intent = getIntent();
-        Movie receivedMovie = (Movie) intent.getSerializableExtra(MOVIE);
+        receivedMovie = (Movie) intent.getSerializableExtra(MOVIE);
         ActionBar bar = getSupportActionBar();
         if (bar != null) {
             bar.setDisplayHomeAsUpEnabled(true);
             bar.setTitle(receivedMovie.getTitle());
         }
 
-        TextView moviePlot = (TextView) findViewById(R.id.tv_plot);
-        TextView releaseDetails = (TextView) findViewById(R.id.tv_release);
-        TextView rating = (TextView) findViewById(R.id.tv_rating);
-        ImageView moviePoster = (ImageView) findViewById(R.id.iv_poster);
+        movieDatabase = MovieDatabase.getInstance(getApplicationContext());
+
+        TextView moviePlot = findViewById(R.id.tv_plot);
+        TextView releaseDetails = findViewById(R.id.tv_release);
+        TextView rating = findViewById(R.id.tv_rating);
+        ImageView moviePoster = findViewById(R.id.iv_poster);
         trailerBtn = findViewById(R.id.btn_trailer);
+        favoriteBtn = findViewById(R.id.btn_favorite);
         trailerLayout = findViewById(R.id.trailer_layout);
         reviewTv = findViewById(R.id.tv_review);
 
@@ -63,11 +77,48 @@ public class MovieDetails extends AppCompatActivity {
         rating.setText(receivedMovie.getRating());
         Picasso.get().load(receivedMovie.getPosterURL()).into(moviePoster);
 
-
         // Execute get trailers and reviews
-        new MovieTrailerQueryTask(trailerBtn).execute(receivedMovie.getId());
-        new MovieReviewsQueryTask().execute(receivedMovie.getId());
+        new MovieTrailerQueryTask(trailerBtn).execute(String.valueOf(receivedMovie.getId()));
+        new MovieReviewsQueryTask().execute(String.valueOf(receivedMovie.getId()));
+
+        LiveData<Movie> liveDataMovie = movieDatabase.movieDao().loadMovieById(receivedMovie.getId());
+        liveDataMovie.observe(this, new Observer<Movie>() {
+            @Override
+            public void onChanged(Movie movie) {
+                if (movie == null) {
+                    System.out.println("This movie is not one of your favorites..");
+                } else {
+                    System.out.println("Found a favorited movie.");
+                    System.out.println(movie.getTitle());
+                    favorited = true;
+                    favoriteBtn.setChecked(true);
+                }
+            }
+        });
+
+        favoriteBtn.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean favoriteClicked) {
+                if (favoriteClicked) {
+                    AppExecutors.getInstance().diskIO().execute(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (!favorited) {
+                                movieDatabase.movieDao().insertMovie(receivedMovie);
+                            }
+                        }
+                    });
+                } else {
+                    Toast.makeText(getApplicationContext(), "Unfavorite was clicked", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
     }
+
+    private void onFavoriteClicked() {
+        Toast.makeText(getApplicationContext(), "Favorite was clicked", Toast.LENGTH_SHORT).show();
+    }
+
 
     private class MovieTrailerQueryTask extends AsyncTask<String, Void, String> {
         public Button playTrailerBtn;

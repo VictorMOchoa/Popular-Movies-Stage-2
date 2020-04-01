@@ -23,7 +23,8 @@ import static com.roundfifteen.popularmovies.util.Constants.*;
 
 public class MainActivity extends AppCompatActivity implements MovieAdapter.MoviesAdapterOnClickListener {
     public MovieAdapter adapter;
-    public String apiURL = "https://api.themoviedb.org/3/movie/popular?page=1&language=en-US&api_key=a7901e37a265259bfaab23ef7eefa86e";
+    public String apiKey = BuildConfig.API_KEY;
+    public String apiURL = "https://api.themoviedb.org/3/movie/popular?page=1&language=en-US&api_key=" + apiKey;
     public RecyclerView moviesRecyclerView;
 
     @Override
@@ -94,10 +95,10 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
         int id = item.getItemId();
         switch (id) {
             case R.id.item_popular:
-                apiURL = "https://api.themoviedb.org/3/movie/popular?page=1&language=en-US&api_key=a7901e37a265259bfaab23ef7eefa86e";
+                apiURL = "https://api.themoviedb.org/3/movie/popular?page=1&language=en-US&api_key=" + apiKey;
                 break;
             case R.id.item_rating:
-                apiURL = "https://api.themoviedb.org/3/movie/top_rated?page=1&language=en-US&api_key=a7901e37a265259bfaab23ef7eefa86e";
+                apiURL = "https://api.themoviedb.org/3/movie/top_rated?page=1&language=en-US&api_key=" + apiKey;
                 break;
         }
         loadMovies();

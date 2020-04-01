@@ -32,6 +32,7 @@ import okhttp3.Response;
 import static com.roundfifteen.popularmovies.util.Constants.MOVIE;
 
 public class MovieDetails extends AppCompatActivity {
+ public String apiKey = BuildConfig.API_KEY;
  public LinearLayout trailerLayout;
  public Button trailerBtn;
  public TextView reviewTv;
@@ -77,7 +78,7 @@ public class MovieDetails extends AppCompatActivity {
         @Override
         protected String doInBackground(String... movieIds) {
             String trailerKey = null;
-            String apiURL = "https://api.themoviedb.org/3/movie/" + movieIds[0] + "/videos?page=1&language=en-US&api_key=a7901e37a265259bfaab23ef7eefa86e";
+            String apiURL = "https://api.themoviedb.org/3/movie/" + movieIds[0] + "/videos?page=1&language=en-US&api_key=" + apiKey;
             OkHttpClient client = new OkHttpClient();
             Request request = new Request.Builder()
                     .url(apiURL)
@@ -121,7 +122,7 @@ public class MovieDetails extends AppCompatActivity {
         @Override
         protected String doInBackground(String... movieIds) {
 
-            String apiURL = "https://api.themoviedb.org/3/movie/" + movieIds[0] + "/reviews?page=1&language=en-US&api_key=a7901e37a265259bfaab23ef7eefa86e";
+            String apiURL = "https://api.themoviedb.org/3/movie/" + movieIds[0] + "/reviews?page=1&language=en-US&api_key=" + apiKey;
             OkHttpClient client = new OkHttpClient();
             Request request = new Request.Builder()
                     .url(apiURL)

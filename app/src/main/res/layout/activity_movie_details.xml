@@ -27,6 +27,15 @@
                 app:srcCompat="@android:drawable/alert_dark_frame" />
 
 
+            <ToggleButton
+                android:id="@+id/toggleButton"
+                android:layout_width="109dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right"
+                android:text="ToggleButton"
+                android:textOff="Unfavorite"
+                android:textOn="Favorite" />
+
             <TextView
                 android:id="@+id/tv_rating_label"
                 android:layout_width="match_parent"
@@ -72,6 +81,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="15dp"
                 android:textColor="@android:color/background_light" />
+
             <LinearLayout
                     android:id="@+id/trailer_layout"
                     android:layout_width="match_parent"

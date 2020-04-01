@@ -64,6 +64,7 @@ public class MovieDetails extends AppCompatActivity {
         Picasso.get().load(receivedMovie.getPosterURL()).into(moviePoster);
 
 
+        // Execute get trailers and reviews
         new MovieTrailerQueryTask(trailerBtn).execute(receivedMovie.getId());
         new MovieReviewsQueryTask().execute(receivedMovie.getId());
     }

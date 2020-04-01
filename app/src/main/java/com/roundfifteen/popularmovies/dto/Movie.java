@@ -3,17 +3,24 @@ package com.roundfifteen.popularmovies.dto;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import androidx.annotation.NonNull;
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.Serializable;
 
+@Entity(tableName = "favoriteMovies")
 public class Movie implements Serializable {
     private String title;
     private String posterURL;
     private String plot;
     private String rating;
     private String releaseData;
+    @PrimaryKey
+    @NonNull
     private String id;
     private int trailerPath;
 

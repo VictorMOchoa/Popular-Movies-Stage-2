@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.Menu;
@@ -35,7 +36,15 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
         setContentView(R.layout.activity_main);
 
         moviesRecyclerView = (RecyclerView) findViewById(R.id.rv_movies);
-        int numOfColumns = 2;
+
+        int numOfColumns;
+        int orientation = getResources().getConfiguration().orientation;
+        if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            numOfColumns = 4;
+        } else {
+            numOfColumns = 2;
+        }
+
         GridLayoutManager layoutManager = new GridLayoutManager(this, numOfColumns);
 
         moviesRecyclerView.setHasFixedSize(true);

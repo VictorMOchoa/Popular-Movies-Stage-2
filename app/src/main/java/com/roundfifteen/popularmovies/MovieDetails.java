@@ -41,6 +41,7 @@ import static com.roundfifteen.popularmovies.util.Constants.MOVIE;
 public class MovieDetails extends AppCompatActivity {
  public String apiKey = BuildConfig.API_KEY;
  public LinearLayout trailerLayout;
+ public LinearLayout reviewLayout;
  public Button trailerBtn;
  public ToggleButton favoriteBtn;
  public TextView reviewTv;
@@ -71,6 +72,7 @@ public class MovieDetails extends AppCompatActivity {
         favoriteBtn = findViewById(R.id.btn_favorite);
         trailerLayout = findViewById(R.id.trailer_layout);
         reviewTv = findViewById(R.id.tv_review);
+        System.out.println(receivedMovie.getPosterURL());
 
         moviePlot.setText(receivedMovie.getPlot());
         releaseDetails.setText(receivedMovie.getReleaseData());
@@ -81,20 +83,7 @@ public class MovieDetails extends AppCompatActivity {
         new MovieTrailerQueryTask(trailerBtn).execute(String.valueOf(receivedMovie.getId()));
         new MovieReviewsQueryTask().execute(String.valueOf(receivedMovie.getId()));
 
-        LiveData<Movie> liveDataMovie = movieDatabase.movieDao().loadMovieById(receivedMovie.getId());
-        liveDataMovie.observe(this, new Observer<Movie>() {
-            @Override
-            public void onChanged(Movie movie) {
-                if (movie == null) {
-                    System.out.println("This movie is not one of your favorites..");
-                } else {
-                    System.out.println("Found a favorited movie.");
-                    System.out.println(movie.getTitle());
-                    favorited = true;
-                    favoriteBtn.setChecked(true);
-                }
-            }
-        });
+        checkIfMovieIsFavorite();
 
         favoriteBtn.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -109,16 +98,30 @@ public class MovieDetails extends AppCompatActivity {
                         }
                     });
                 } else {
-                    Toast.makeText(getApplicationContext(), "Unfavorite was clicked", Toast.LENGTH_SHORT).show();
+                    AppExecutors.getInstance().diskIO().execute(new Runnable() {
+                        @Override
+                        public void run() {
+                            movieDatabase.movieDao().deleteMovie(receivedMovie.getId());
+                            favorited = false;
+                        }
+                    });
                 }
             }
         });
     }
 
-    private void onFavoriteClicked() {
-        Toast.makeText(getApplicationContext(), "Favorite was clicked", Toast.LENGTH_SHORT).show();
+    private void checkIfMovieIsFavorite() {
+        LiveData<Movie> liveDataMovie = movieDatabase.movieDao().loadMovieById(receivedMovie.getId());
+        liveDataMovie.observe(this, new Observer<Movie>() {
+            @Override
+            public void onChanged(Movie movie) {
+                if (movie != null) {
+                    favorited = true;
+                    favoriteBtn.setChecked(true);
+                }
+            }
+        });
     }
-
 
     private class MovieTrailerQueryTask extends AsyncTask<String, Void, String> {
         public Button playTrailerBtn;

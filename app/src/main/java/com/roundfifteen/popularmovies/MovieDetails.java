@@ -101,6 +101,7 @@ public class MovieDetails extends AppCompatActivity {
 
         protected void onPostExecute(final String trailerKey) {
             try {
+                // If null, hide the trailer section altogether
                 if (trailerKey == null) {
                     trailerLayout.setVisibility(View.GONE);
                 } else {
@@ -146,7 +147,6 @@ public class MovieDetails extends AppCompatActivity {
 
         protected void onPostExecute(String review) {
             try {
-                System.out.println(review);
                 reviewTv.setText(review);
             } catch (Error e) {
                 System.out.println(e);

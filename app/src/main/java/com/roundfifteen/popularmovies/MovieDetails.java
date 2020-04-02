@@ -17,6 +17,9 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.View;
 import android.widget.Button;
@@ -44,10 +47,11 @@ public class MovieDetails extends AppCompatActivity {
  public LinearLayout reviewLayout;
  public Button trailerBtn;
  public ToggleButton favoriteBtn;
- public TextView reviewTv;
  public Movie receivedMovie;
  public MovieDatabase movieDatabase;
  public boolean favorited = false;
+ public MovieReviewAdapter movieReviewAdapter;
+ public RecyclerView reviewRecyclerView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,7 +75,14 @@ public class MovieDetails extends AppCompatActivity {
         trailerBtn = findViewById(R.id.btn_trailer);
         favoriteBtn = findViewById(R.id.btn_favorite);
         trailerLayout = findViewById(R.id.trailer_layout);
-        reviewTv = findViewById(R.id.tv_review);
+        reviewLayout = findViewById(R.id.review_layout);
+
+        reviewRecyclerView = findViewById(R.id.rv_reviews);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+        linearLayoutManager.setOrientation(RecyclerView.VERTICAL);
+        reviewRecyclerView.setLayoutManager(linearLayoutManager);
+
+
         System.out.println(receivedMovie.getPosterURL());
 
         moviePlot.setText(receivedMovie.getPlot());
@@ -111,8 +122,12 @@ public class MovieDetails extends AppCompatActivity {
     }
 
     private void checkIfMovieIsFavorite() {
-        LiveData<Movie> liveDataMovie = movieDatabase.movieDao().loadMovieById(receivedMovie.getId());
-        liveDataMovie.observe(this, new Observer<Movie>() {
+        MovieDetailsViewModelFactory factory =
+                new MovieDetailsViewModelFactory (movieDatabase, receivedMovie.getId());
+
+        final MovieDetailsViewModel viewModel = ViewModelProviders.of(this, factory).get(MovieDetailsViewModel.class);
+
+        viewModel.getMovie().observe(this, new Observer<Movie>() {
             @Override
             public void onChanged(Movie movie) {
                 if (movie != null) {
@@ -173,12 +188,13 @@ public class MovieDetails extends AppCompatActivity {
         }
     }
 
-    private class MovieReviewsQueryTask extends AsyncTask<String, Void, String> {
+    private class MovieReviewsQueryTask extends AsyncTask<String, Void, List<String>> {
 
         @Override
-        protected String doInBackground(String... movieIds) {
+        protected List<String> doInBackground(String... movieIds) {
 
             String apiURL = "https://api.themoviedb.org/3/movie/" + movieIds[0] + "/reviews?page=1&language=en-US&api_key=" + apiKey;
+            System.out.println(apiURL);
             OkHttpClient client = new OkHttpClient();
             Request request = new Request.Builder()
                     .url(apiURL)
@@ -188,7 +204,7 @@ public class MovieDetails extends AppCompatActivity {
                 Response response = client.newCall(request).execute();
                 try {
 
-                    String reviews = ResponseUtil.extractReviewsFromResponse(response.body().string());
+                    List<String> reviews = ResponseUtil.extractReviewsFromResponse(response.body().string());
                     return reviews;
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -197,12 +213,17 @@ public class MovieDetails extends AppCompatActivity {
             } catch (IOException e) {
                 System.out.println(e);
             }
-            return "";
+            return null;
         }
 
-        protected void onPostExecute(String review) {
+        protected void onPostExecute(List<String> reviews) {
             try {
-                reviewTv.setText(review);
+                if (reviews != null) {
+                    movieReviewAdapter = new MovieReviewAdapter(MovieDetails.this, reviews);
+                    reviewRecyclerView.setAdapter(movieReviewAdapter);
+                } else {
+                    reviewLayout.setVisibility(View.GONE);
+                }
             } catch (Error e) {
                 System.out.println(e);
             }

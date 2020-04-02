@@ -30,10 +30,9 @@ public class ResponseUtil {
             return null;
         } else {
             List<String> reviews = new ArrayList<>();
-            System.out.println(resultArray.length());
             for (int i = 0; i < resultArray.length(); i++) {
                 JSONObject currElement = resultArray.getJSONObject(i);
-                reviews.add(currElement.getString("content"));
+                reviews.add(currElement.getString(CONTENT));
             }
 
             return reviews;

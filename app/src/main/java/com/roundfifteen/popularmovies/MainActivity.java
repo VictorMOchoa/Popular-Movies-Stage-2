@@ -34,9 +34,9 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        moviesRecyclerView = findViewById(R.id.rv_movies);
 
-        moviesRecyclerView = (RecyclerView) findViewById(R.id.rv_movies);
-
+        // Dynamically change the number of columns depending on orientation
         int numOfColumns;
         int orientation = getResources().getConfiguration().orientation;
         if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
@@ -46,7 +46,6 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
         }
 
         GridLayoutManager layoutManager = new GridLayoutManager(this, numOfColumns);
-
         moviesRecyclerView.setHasFixedSize(true);
         moviesRecyclerView.setLayoutManager(layoutManager);
 
@@ -55,14 +54,12 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
     }
 
     private void loadMovies() {
+        // If no apiURL, then user wants to view their favorites
         if (apiURL == null) {
            MainViewModel mainViewModel = ViewModelProviders.of(this).get(MainViewModel.class);
            mainViewModel.getAllMovies().observe(this, new Observer<List<Movie>>() {
                @Override
                public void onChanged(List<Movie> movies) {
-                   for (int i = 0; i < movies.size(); i++) {
-                       System.out.println(movies.get(i).getTitle());
-                   }
                    adapter = new MovieAdapter(MainActivity.this, MainActivity.this, movies);
                    moviesRecyclerView.setAdapter(adapter);
                }
@@ -92,7 +89,6 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
             try {
                 Response response = client.newCall(request).execute();
                 return createMovieDataList(response.body().string());
-
             } catch (JSONException | IOException e) {
                 System.out.println(e);
             }

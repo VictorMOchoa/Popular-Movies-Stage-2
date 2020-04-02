@@ -57,9 +57,10 @@ public class MovieDetails extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_movie_details);
-
+        // Retrieve movie from Main Activity intent
         Intent intent = getIntent();
         receivedMovie = (Movie) intent.getSerializableExtra(MOVIE);
+        // Set movie title in actionbar
         ActionBar bar = getSupportActionBar();
         if (bar != null) {
             bar.setDisplayHomeAsUpEnabled(true);
@@ -75,16 +76,14 @@ public class MovieDetails extends AppCompatActivity {
         trailerBtn = findViewById(R.id.btn_trailer);
         favoriteBtn = findViewById(R.id.btn_favorite);
         trailerLayout = findViewById(R.id.trailer_layout);
+        // Setup review section
         reviewLayout = findViewById(R.id.review_layout);
-
         reviewRecyclerView = findViewById(R.id.rv_reviews);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         linearLayoutManager.setOrientation(RecyclerView.VERTICAL);
         reviewRecyclerView.setLayoutManager(linearLayoutManager);
 
-
-        System.out.println(receivedMovie.getPosterURL());
-
+        // Set movie details
         moviePlot.setText(receivedMovie.getPlot());
         releaseDetails.setText(receivedMovie.getReleaseData());
         rating.setText(receivedMovie.getRating());
@@ -96,6 +95,10 @@ public class MovieDetails extends AppCompatActivity {
 
         checkIfMovieIsFavorite();
 
+        setFavoriteButtonActions();
+    }
+
+    private void setFavoriteButtonActions() {
         favoriteBtn.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean favoriteClicked) {
@@ -203,13 +206,11 @@ public class MovieDetails extends AppCompatActivity {
             try {
                 Response response = client.newCall(request).execute();
                 try {
-
                     List<String> reviews = ResponseUtil.extractReviewsFromResponse(response.body().string());
                     return reviews;
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-
             } catch (IOException e) {
                 System.out.println(e);
             }
@@ -218,6 +219,7 @@ public class MovieDetails extends AppCompatActivity {
 
         protected void onPostExecute(List<String> reviews) {
             try {
+                // Set the reviews, else hide the section
                 if (reviews != null) {
                     movieReviewAdapter = new MovieReviewAdapter(MovieDetails.this, reviews);
                     reviewRecyclerView.setAdapter(movieReviewAdapter);
